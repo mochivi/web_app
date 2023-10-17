@@ -1,19 +1,17 @@
-use actix_web::{web, App, HttpServer, Responder, HttpRequest};
-
-async fn greet(req: HttpRequest) -> impl Responder {
-    let name = req.match_info().get("name").unwrap_or("World");
-    format!("Hello {}!", name)
-}
+use actix_web::{App, HttpServer};
+mod views;
+mod to_do;
+mod state;
+mod processes;
+mod json_serialization;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
-        App::new()
-        .route("/", web::get().to(greet))
-        .route("/{name}", web::get().to(greet))
-        .route("/say/hello", web::get().to(|| async {"Hello Again!"}))
+        let app = App::new().configure(views::views_factory);
+        return app;
     })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+        .bind("127.0.0.1:8000")?
+        .run()
+        .await
 }
